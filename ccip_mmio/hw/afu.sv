@@ -71,23 +71,6 @@ module afu
    t_ccip_c0_ReqMmioHdr mmio_hdr;
    assign mmio_hdr = t_ccip_c0_ReqMmioHdr'(rx.c0.hdr);
 
-
-   // Allison's code
-   logic rst_n;
-   logic [1:0] ccip_tx_temp;
-   assign rst_n = !rst;
-   fifo FIFO1 (.clk(clk), .rst_n(rst_n), .d(rx.c0.data), .q(ccip_tx_temp), .en(rx.c0.mmioWrValid));
-   always_ff @(posedge clk or posedge rst)
-   begin
-	   if (rst)
-	   begin
-		   tx <= 2'b00;
-	  end
-	  else if (rx.c0.mmioRdValid) begin
-		  tx <= ccip_tx_temp;
-	end
-   end
-
    // =============================================================//   
    // MMIO write code
    // =============================================================// 		    
