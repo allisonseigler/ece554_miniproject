@@ -56,6 +56,9 @@ int main(int argc, char *argv[]) {
     unsigned errors = 0;
     for (uint64_t i=0; i < 100; i++) {
       afu.write(USER_REG_ADDR, i);
+      for (uint64_t j=0; j < 7; j++) {
+	      afu.write(USER_REG_ADDR, 0);
+	{
       uint64_t result = afu.read(USER_REG_ADDR);
 
       if (result != i) {
