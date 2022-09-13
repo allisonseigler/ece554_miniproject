@@ -71,30 +71,28 @@ module afu
    t_ccip_c0_ReqMmioHdr mmio_hdr;
    assign mmio_hdr = t_ccip_c0_ReqMmioHdr'(rx.c0.hdr);
 
+   logic rst_n, fifo_en;
+   logic [63:0] fifo_out;
+   assign rst_n = !rst;
+   fifo FIFO1 (.clk(clk), .rst_n(rst_n), .en(fifo_en), .d(rx.c0.data), .q(fifo_out);
+
    // =============================================================//   
    // MMIO write code
    // =============================================================// 		    
-   always_ff @(posedge clk or posedge rst)
+   always_ff @(posedge clk)
      begin 
-        if (rst)
-          begin 
-	     // Asnchronous reset for the memory-mapped register.
-	     user_reg <= '0;
-          end
-        else
-          begin
-             // Check to see if there is a valid write being received from the processor.
-             if (rx.c0.mmioWrValid == 1)
-               begin
-		  // Check the address of the write request. If it maches the address of the
-		  // memory-mapped register (h0020), then write the received data on channel c0 
-		  // to the register.
-                  case (mmio_hdr.address)
-                    16'h0020: user_reg <= rx.c0.data[63:0];
-                  endcase
-               end
-          end
-     end
+
+    // Check to see if there is a valid write being received from the processor.
+    // Check the address of the write request. If it maches the address of the
+    // memory-mapped register (h0020), then write the received data on channel c0 
+    // to the register.
+    if ((rx.c0.mmioWrValid == 1) && (mmio_hdr.address = 16'h0020) begin
+      fifo_en <= 1'b1;
+    end else begin
+      fifo_en <= 1'b0;
+    end
+
+   end
 
    // ============================================================= 		    
    // MMIO read code
@@ -161,7 +159,7 @@ module afu
 		    // =============================================================   
 		    
                     // Provide the 64-bit data from the user register mapped to h0020.
-                    16'h0020: tx.c2.data <= user_reg;
+                    16'h0020: tx.c2.data <= fifo_out;
 
 		    // If the processor requests an address that is unused, return 0.
                     default:  tx.c2.data <= 64'h0;
