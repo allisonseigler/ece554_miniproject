@@ -74,7 +74,7 @@ module afu
    logic rst_n, fifo_en;
    logic [63:0] fifo_out;
    assign rst_n = !rst;
-   fifo FIFO1 (.clk(clk), .rst_n(rst_n), .en(fifo_en), .d(rx.c0.data), .q(fifo_out);
+   fifo FIFO1 (.clk(clk), .rst_n(rst_n), .en(fifo_en), .d(rx.c0.data), .q(fifo_out));
 
    // =============================================================//   
    // MMIO write code
@@ -86,7 +86,7 @@ module afu
     // Check the address of the write request. If it maches the address of the
     // memory-mapped register (h0020), then write the received data on channel c0 
     // to the register.
-    if ((rx.c0.mmioWrValid == 1) && (mmio_hdr.address = 16'h0020) begin
+    if ((rx.c0.mmioWrValid == 1) && (mmio_hdr.address == 16'h0020)) begin
       fifo_en <= 1'b1;
     end else begin
       fifo_en <= 1'b0;
